@@ -1,38 +1,57 @@
 const input = document.getElementById("input-box");
 const list = document.getElementById("list-container");
 
-function addtask(){
-    if(input.value === ''){
+function addtask() {
+    if (input.value === '') {
         alert("Write Something");
-    }
-    else{
+    } else {
         let li = document.createElement("li");
-        li.innerHTML = input.value;
+        li.innerHTML = input.value + '<span>\u00d7</span>';
         list.appendChild(li);
-        let span = document.createElement("span");
-        span.innerHTML ="\u00d7";
-        li.appendChild(span);
     }
     input.value = '';
     savedata();
 }
 
-list.addEventListener("click",function(e){
-    if(e.target.tagName === "LI"){
+list.addEventListener("click", function (e) {
+    if (e.target.tagName === "LI") {
         e.target.classList.toggle("checked");
         savedata();
-    }
-    else if(e.target.tagName === "SPAN"){
+    } else if (e.target.tagName === "SPAN") {
         e.target.parentElement.remove();
         savedata();
     }
+}, false);
 
-},false);
-function savedata(){
-    localStorage.setItem("data",list.innerHTML);
+list.addEventListener("dblclick", function (e) {
+    if (e.target.tagName === "LI" && !e.target.querySelector('input')) {
+        let currentText = e.target.firstChild.textContent;
+        let inputField = document.createElement("input");
+        inputField.type = "text";
+        inputField.value = currentText;
+        e.target.innerHTML = '';
+        e.target.appendChild(inputField);
+        inputField.focus();
+
+        inputField.addEventListener('blur', function () {
+            e.target.innerHTML = inputField.value + '<span>\u00d7</span>';
+            savedata();
+        });
+
+        inputField.addEventListener('keypress', function (event) {
+            if (event.key === 'Enter') {
+                inputField.blur();
+            }
+        });
+    }
+}, false);
+
+function savedata() {
+    localStorage.setItem("data", list.innerHTML);
 }
-function showdata(){
+
+function showdata() {
     list.innerHTML = localStorage.getItem("data");
 }
-showdata();
 
+showdata();
